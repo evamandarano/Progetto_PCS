@@ -6,13 +6,16 @@
 #include <cmath>
 #include <algorithm>
 #include <sstream>
-
+// Classe Point 
 class Point {
 public:
-    double x;
+    // definisco gli attributi in public (possono essere ereditati)
+    double x; // attributi
     double y;
-
+    // double == 
     Point(double _x, double _y) : x(_x), y(_y) {}
+    // x(_x), y(_y) è la lista di inizializzazione. È una sintassi speciale che viene utilizzata per inizializzare i membri dati della classe con i valori dei parametri passati al costruttore. In questo caso, x(_x) inizializza il membro dati x con il valore di _x, e y(_y) inizializza il membro dati y con il valore di _y.
+    
 };
 
 class Triangle {
