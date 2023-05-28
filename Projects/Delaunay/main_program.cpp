@@ -1,10 +1,93 @@
 #include "empty_class.hpp"
 
-int main()
-{
-  ProjectLibrary::Empty empty;
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include <sstream>
 
-  empty.Show();
+class Point {
+public:
+    double x;
+    double y;
 
-  return 0;
+    Point(double _x, double _y) : x(_x), y(_y) {}
+};
+
+class Triangle {
+public:
+    Point p1;
+    Point p2;
+    Point p3;
+
+    Triangle(const Point& _p1, const Point& _p2, const Point& _p3) : p1(_p1), p2(_p2), p3(_p3) {}
+
+    double calculateArea() const {
+        return std::abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2);
+    }
+
+    void orderPointsCounterclockwise() {
+        std::vector<Point> points = {p1, p2, p3};
+        std::sort(points.begin(), points.end(), [](const Point& p1, const Point& p2) {
+            return (std::atan2(p1.y, p1.x) < std::atan2(p2.y, p2.x));
+        });
+
+        p1 = points[0];
+        p2 = points[1];
+        p3 = points[2];
+    }
+
+    bool isPointInside(const Point& Q) const {
+        double totalArea = calculateArea();
+        double area1 = calculateArea(Q, p2, p3);
+        double area2 = calculateArea(p1, Q, p3);
+        double area3 = calculateArea(p1, p2, Q);
+
+        return std::abs(totalArea - (area1 + area2 + area3)) < 1e-6;
+    }
+
+private:
+    double calculateArea(const Point& p1, const Point& p2, const Point& p3) const {
+        return std::abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2);
+    }
+};
+
+std::vector<Point> importPointsFromCSV(const std::string& filename) {
+    std::vector<Point> points;
+
+    std::ifstream file(filename);
+    if (!file) {
+        std::cout << "Error opening file: " << filename << std::endl;
+        return points;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string xStr, yStr;
+        if (std::getline(ss, xStr, ',') && std::getline(ss, yStr, ',')) {
+            double x = std::stod(xStr);
+            double y = std::stod(yStr);
+            points.emplace_back(x, y);
+        }
+    }
+
+    file.close();
+    return points;
 }
+
+bool findTriangleContainingPoint(const Point& Q, const std::vector<Triangle>& triangles, Triangle& result) {
+    for (const auto& triangle : triangles) {
+        if (triangle.isPointInside(Q)) {
+            result = triangle;
+            return true;
+        }
+    }
+    return false;
+}
+
+void connectPointWithTriangle(const Point& Q, const Triangle& T) {
+    // Implementa la logica per unire il punto Q con i vertici del triangolo T
+    // Ad esempio, puoi stampare i segmenti che collegano Q
+    std::vector<Point> points = importPointsFromCSV("points.csv");
